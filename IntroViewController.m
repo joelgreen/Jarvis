@@ -131,7 +131,7 @@ int lastRained;
 
     for (int i = 0; i < RAIN_SPOTS; i++) {
         rained[i] = false;
-        rainSpots[i] = 44 + 10*i;
+        rainSpots[i] = 50 + 10*i;
     }
     lastRained = 0;
     [self generateBinaryRaindrops];

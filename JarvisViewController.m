@@ -8,6 +8,7 @@
 
 #import "JarvisViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import <Foundation/Foundation.h>
 #import "LocationManager.h"
 #import "ServerPostManger.h"
 
@@ -18,11 +19,33 @@
 @property (strong, nonatomic) LocationManager *locationManager;
 @property (strong, nonatomic) ServerPostManger *serverPostManager;
 
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (strong, nonatomic) NSDate *time;
+@property (strong, nonatomic) NSTimer *updateTimer;
+
+@property (weak, nonatomic) IBOutlet UILabel *jarvisLabel;
+
+
+@property (weak, nonatomic) IBOutlet UIButton *alarmButton;
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
+@property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
+
+@property (strong, nonatomic) AVAudioPlayer *audioPlayer;
+
+
 @end
 
 @implementation JarvisViewController
 
 
+-(NSDate *)time
+{
+    if (!_time) {
+        _time = [[NSDate alloc] init];
+    }
+    _time = [NSDate date];
+    return _time;
+}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
@@ -46,25 +69,19 @@
     }
 }
 
+- (void)updateTime
+{
+    NSDateFormatter *f = [[NSDateFormatter alloc] init];
+    [f setTimeStyle:NSDateFormatterMediumStyle];
+    self.timeLabel.text = [f stringFromDate:self.time];
+    
+    self.updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(updateTime) userInfo:Nil repeats:NO];
+}
+
 - (IBAction)connectButtonPressed:(id)sender
 {
     NSDictionary *reqDict = @{@"latitude": @34.01, @"longitude" : @-118.5, @"user" : [self.serverPostManager uuid]};
     [self.serverPostManager requestCards:reqDict];
-    
-//    NSDictionary *requestDict = [NSDictionary dictionaryWithObjectsAndKeys:
-//                                 [self uuid], @"id",@"b", @"password", nil];
-//    
-//    NSMutableURLRequest *request = [self generateUrlRequest:@"http://jarvisupdate.com/CreateUser.php"
-//                                                          withDictionary:requestDict];
-//    
-//    NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];
-//    if(conn) {
-//        NSLog(@"Connection Successful in connectButtonPressed");
-//    }
-//    else {
-//        NSLog(@"Connection could not be made in connectButtonPressed");
-//    }
-
 }
 
 - (IBAction)startButtonPressed:(id)sender {
@@ -79,10 +96,54 @@
 {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor redColor];
-//    [self animate];
+    self.jarvisLabel.font = [UIFont fontWithName:@"Neou-Thin" size:50];
+    self.jarvisLabel.textColor = [UIColor colorWithRed:241/255.0f
+                                                 green:88/255.0f
+                                                  blue:36/255.0f
+                                                 alpha:1];
+    
+    self.timeLabel.font = [UIFont fontWithName:@"GillSans-Light" size:50];
+    self.timeLabel.textColor = [UIColor colorWithRed:255/255.0f
+                                               green:255/255.0f
+                                                blue:255/255.0f
+                                               alpha:1];
+    
+    self.mainTextView.textColor = [UIColor colorWithRed:255/255.0f
+                                                  green:255/255.0f
+                                                   blue:255/255.0f
+                                                  alpha:1];
+    self.mainTextView.font = [UIFont fontWithName:@"Roboto-Regular" size:14];
+    
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgcloud"]];
     
     self.mainTextView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
+    
+    
+    
+    self.bottomLabel.layer.borderWidth = 3;
+    
+    self.bottomLabel.layer.borderColor = [UIColor colorWithRed:54/255.0f
+                                                              green:59/255.0f
+                                                               blue:63/255.0f
+                                                              alpha:1].CGColor;
+    self.bottomLabel.backgroundColor = [UIColor colorWithRed:34/255.0f
+                                                            green:34/255.0f
+                                                             blue:34/255.0f
+                                                            alpha:1];
+    
+    self.alarmButton.layer.cornerRadius = 0;
+    self.alarmButton.layer.backgroundColor = [UIColor colorWithRed:241/255.0f
+                                                          green:88/255.0f
+                                                           blue:36/255.0f
+                                                          alpha:1].CGColor;
+    self.alarmButton.titleLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
+    
+    self.settingsButton.layer.cornerRadius = 0;
+    self.settingsButton.layer.backgroundColor = [UIColor colorWithRed:204/255.0f
+                                                             green:204/255.0f
+                                                              blue:204/255.0f
+                                                             alpha:1].CGColor;
+    self.settingsButton.titleLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
     
     _serverPostManager = [[ServerPostManger alloc] init];
     
@@ -98,15 +159,26 @@
     
     _locationManager = [[LocationManager alloc] init];
     [self.locationManager updateLocation];
-    
+    [self updateTime];
 //    [self.serverPostManager createUser];
     
 //    NSLog(@"%f",AVSpeechUtteranceDefaultSpeechRate);
+    
+    [self playSoundNamed:@"Perspectives"];
+    
+    
+    NSDictionary *reqDict = @{@"latitude": @34.01, @"longitude" : @-118.5, @"user" : [self.serverPostManager uuid]};
+    [self.serverPostManager requestCards:reqDict];
 }
 
 - (void)incomingData:(NSNotification *)notification
 {
     self.mainTextView.text = [self.serverPostManager.incoming objectForKey:@"human"];
+    AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString:self.mainTextView.text];
+    utterance.rate = 0.3;
+    AVSpeechSynthesizer *syn = [[AVSpeechSynthesizer alloc] init];
+    utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-au"];
+    [syn speakUtterance:utterance];
 }
 
 - (void)animate
@@ -125,6 +197,11 @@
     return color;
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    [_audioPlayer stop];
+}
+
 - (void)updatedLocation:(NSNotification *)notification
 {
     NSNumber *lat = [NSNumber numberWithDouble:self.locationManager.location.coordinate.latitude];
@@ -138,9 +215,6 @@
 //    [ServerPostManger requestCards:re];
     
     NSLog(@"location: %@,%@",lat,lon);
-    
-    
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -170,6 +244,28 @@
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Current-Type"];
     [request setHTTPBody:postData];
     return request;
+}
+
+- (void)playSoundNamed:(NSString *)sound
+{
+    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle]
+                                         pathForResource:sound
+                                         ofType:@"m4a"]];
+    NSError *error;
+    _audioPlayer = [[AVAudioPlayer alloc]
+                    initWithContentsOfURL:url
+                    error:&error];
+    
+    if (error)
+    {       
+        NSLog(@"Error in audioPlayer: %@",
+              [error localizedDescription]);
+    } else {
+        [_audioPlayer prepareToPlay];
+    }
+    
+    [_audioPlayer play];
+    
 }
 
 @end

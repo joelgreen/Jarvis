@@ -104,6 +104,9 @@
 
 - (void)sendRss:(NSArray *)rss
 {
+    if (![rss count]) {
+        return;
+    }
     NSDictionary *reqDict = @{@"rss" : [rss firstObject], @"user" : [self uuid]};
     NSURLRequest *request = [self generateUrlRequest:@"http://jarvisupdate.com/AddRss.php" withDictionary:reqDict];
     NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];

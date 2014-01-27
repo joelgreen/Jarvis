@@ -44,12 +44,23 @@
                                                    green:88/255.0f
                                                     blue:36/255.0f
                                                    alpha:1].CGColor;
+//    self.okButton.titleLabel.textColor = [UIColor colorWithRed:241/255.0f
+//                                                          green:88/255.0f
+//                                                           blue:36/255.0f
+//                                                          alpha:1];
+    
     self.okButton.titleLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
     
 //    self.okButton.titleLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:20];
-    self.addStocksLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:22];
+    
+    self.addStocksLabel.font = [UIFont fontWithName:@"GillSans-Light" size:28];
+    
     self.textEntry.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
-    self.addStocksLabel.textColor = [UIColor colorWithRed:225 green:225 blue:225 alpha:1];
+    
+    self.addStocksLabel.textColor = [UIColor colorWithRed:241/255.0f
+                                                    green:88/255.0f
+                                                     blue:36/255.0f
+                                                    alpha:1];
     
     
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgcloud"]];

@@ -26,7 +26,6 @@
 {
     [super viewDidLoad];
     
-    
     self.bottomSolidLabel.layer.borderWidth = 3;
     
     self.bottomSolidLabel.layer.borderColor = [UIColor colorWithRed:54/255.0f
@@ -45,9 +44,14 @@
                                                           alpha:1].CGColor;
     self.okButton.titleLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
     
-    self.addRssLabel.font = [UIFont fontWithName:@"Roboto-Regular" size:22];
+    self.addRssLabel.font = [UIFont fontWithName:@"GillSans-Light" size:28];
+    
     self.textEntry.font = [UIFont fontWithName:@"Roboto-Regular" size:15];
-    self.addRssLabel.textColor = [UIColor colorWithRed:225 green:225 blue:225 alpha:1];
+    
+    self.addRssLabel.textColor = [UIColor colorWithRed:241/255.0f
+                                                    green:88/255.0f
+                                                     blue:36/255.0f
+                                                    alpha:1];
     
     
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgcloud"]];
@@ -56,6 +60,9 @@
     self.rssTableView.dataSource = self;
     self.rssTableView.delegate = self;
 	// Do any additional setup after loading the view.
+    
+    [self.rss addObject:@"http://feeds.wired.com/wired/index"];
+    
     [self.rssTableView reloadData];
 }
 
@@ -87,7 +94,6 @@
         textField.text = @"";
         [self.rssTableView reloadData];
     }
-    NSLog(@"%@",self.rss);
     return YES;
 }
 
